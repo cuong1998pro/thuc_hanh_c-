@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 
@@ -9,7 +10,44 @@ namespace ADO
         public Form1()
         {
             InitializeComponent();
-            ThuTucVaTruyenParams();
+            HienThiSinhVienKhongCanKetNoi();
+        }
+
+        private void HienThiSinhVienKhongCanKetNoi()
+        {
+            string strCon = @"Data Source=.\sqlexpress;Initial Catalog=SinhVien;Integrated Security=True";
+            var con = new SqlConnection(strCon);
+            try
+            {
+                con.Open();
+                string sql = @"SELECT TOP (1000) [MaSV]
+                              ,[TenSV]
+                              ,[NgaySinh]
+                              ,[DiaChi]
+                              ,[DVHT]
+                            FROM[SinhVien].[dbo].[SinhVien]";
+                var command = new SqlCommand(sql, con);
+
+                //luu tru lai, khong can ket noi van dung duoc,
+                //dataset: tap hop nhieu datatable => datatable: mot bang, gom nhieu hang => data row => data column
+                SqlDataAdapter da = new SqlDataAdapter(command);
+                DataTable dtSV = new DataTable();
+                da.Fill(dtSV);
+                foreach (DataRow row in dtSV.Rows)
+                {
+                    string ID = row["MaSV"].ToString();
+                    string hoten = row["tensv"].ToString();
+                    MessageBox.Show(string.Format("ID: {0}\nHọ tên: {1}", ID, hoten));
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+            }
         }
 
         private void ThuTucVaTruyenParams()
@@ -77,7 +115,7 @@ namespace ADO
             }
         }
 
-        private void KetNoiCSDL()
+        private void HienThiSinhVien()
         {
             string strCon = @"Data Source=.\sqlexpress;Initial Catalog=SinhVien;Integrated Security=True";
             var con = new SqlConnection(strCon);
